@@ -6,6 +6,6 @@ compile:
 run:
 	./tester
 push:
-	git add json.h Makefile README.md
+	git add ./config.h ./Makefile ./README.md
 	git commit -m "1.0"
 	git push -u origin main
