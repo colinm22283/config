@@ -6,43 +6,39 @@
 #define CONFIG_MAJOR_VERSION 1
 #define CONFIG_MINOR_VERSION 1
 
-union cfgVal
-{
-    bool b;
-    int i;
-    float f;
-};
+enum cfgType { BOOL, INT, FLOAT };
+union cfgVal { bool b; int i; float f; };
+struct cfgStruct { cfgVal v; cfgType type; };
 
 class Config
 {
 public:
     Config();
-    Config(std::fstream* _file);
+    Config(std::string path);
 
-    static Config loadFile(std::string path);
+    void writeFile(std::string path);
 
     void set(std::string key, bool value);
     void set(std::string key, int value);
     void set(std::string key, float value);
     cfgVal get(std::string key);
+    cfgType getType(std::string key);
 private:
-    std::fstream* file;
-    std::map<std::string, cfgVal> map;
+    std::map<std::string, cfgStruct> map;
 };
 
-inline Config::Config()
+inline Config::Config() { };
+
+inline Config::Config(std::string path)
 {
-    file = NULL;
-}
-inline Config::Config(std::fstream* _file)
-{
-    file = _file;
+    std::ifstream file;
+    file.open(path);
 
     std::string key;
     std::string value;
-    while (!file->eof())
+    while (!file.eof())
     {
-        *file >> key >> value;
+        file >> key >> value;
 
         if (std::regex_match(value, std::regex("^(?:(?:true)|(?:false))$", std::regex_constants::icase)))
         { set(key, std::regex_match(value, std::regex("^true$", std::regex_constants::icase))); }
@@ -53,36 +49,62 @@ inline Config::Config(std::fstream* _file)
     }
 }
 
-inline Config Config::loadFile(std::string path)
+inline void Config::writeFile(std::string path)
 {
-    std::fstream _file;
-    _file.open(path);
+    std::ofstream file;
+    file.open(path);
 
-    Config proto(&_file);
+    for(std::map<std::string, cfgStruct>::iterator iter = map.begin(); iter != map.end(); ++iter)
+    {
+        std::string k = iter->first;
 
-    return proto;
+        file << k << "          ";
+
+        switch (map[k].type)
+        {
+        case BOOL:
+            file << map[k].v.b ? "True" : "False";
+            break;
+        case INT:
+            file << std::to_string(map[k].v.i);
+            break;
+        case FLOAT:
+            file << std::to_string(map[k].v.f);
+            break;
+        }
+
+        file << "\n";
+    }
 }
 
 inline void Config::set(std::string key, bool value)
 {
-    cfgVal val;
-    val.b = value;
+    cfgStruct val;
+    val.type = cfgType::BOOL;
+    val.v.b = value;
     map[key] = val;
 }
 inline void Config::set(std::string key, int value)
 {
-    cfgVal val;
-    val.i = value;
+    cfgStruct val;
+    val.type = cfgType::INT;
+    val.v.i = value;
     map[key] = val;
 }
 inline void Config::set(std::string key, float value)
 {
-    cfgVal val;
-    val.f = value;
+    cfgStruct val;
+    val.type = cfgType::FLOAT;
+    val.v.f = value;
     map[key] = val;
 }
 
 inline cfgVal Config::get(std::string key)
 {
-    return map[key];
+    return map[key].v;
+}
+
+inline cfgType Config::getType(std::string key)
+{
+    return map[key].type;
 }
