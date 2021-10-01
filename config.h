@@ -4,7 +4,7 @@
 #include <regex>
 
 #define CONFIG_MAJOR_VERSION 1
-#define CONFIG_MINOR_VERSION 1
+#define CONFIG_MINOR_VERSION 0
 
 enum cfgType { BOOL, INT, FLOAT };
 union cfgVal { bool b; int i; float f; };
