@@ -6,6 +6,6 @@ compile:
 run:
 	./tester
 push:
-	git add ./config.h ./Makefile ./README.md
-	git commit -m "1.0"
+	git add ./config.h ./Makefile ./README.md ./demo.cfg
+	git commit -m "1.1"
 	git push -u origin main

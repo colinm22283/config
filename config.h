@@ -1,32 +1,67 @@
 #include <string>
 #include <fstream>
 #include <map>
+#include <regex>
+
+#define CONFIG_MAJOR_VERSION 1
+#define CONFIG_MINOR_VERSION 1
+
+union cfgVal
+{
+    bool b;
+    int i;
+    float f;
+};
 
 class Config
 {
 public:
+    Config();
     Config(std::fstream* _file);
+    ~Config();
 
     static Config loadFile(std::string path);
 
-    void* operator [] (std::string key);
+    void set(std::string key, bool value);
+    void set(std::string key, int value);
+    void set(std::string key, float value);
+    cfgVal get(std::string key);
 private:
     std::fstream* file;
-    std::map<std::string, int> intMap;
-    std::map<std::string, std::string> stringMap;
+    std::map<std::string, cfgVal> map;
 };
 
-#ifndef JSON_FUNCTIONS_DEFINED
-#define JSON_FUNCTIONS_DEFINED
-
-Config::Config(std::fstream* _file)
+inline Config::Config()
+{
+    file = NULL;
+}
+inline Config::Config(std::fstream* _file)
 {
     file = _file;
 
-    intMap["test"] = 4;
+    std::string key;
+    std::string value;
+    while (!file->eof())
+    {
+        *file >> key >> value;
+
+        std::cout << "Value: " << value << "\n";
+        if (std::regex_match(value, std::regex("^(?:(?:true)|(?:false))$", std::regex_constants::icase)))
+        {
+            set(key, std::regex_match(value, std::regex("^true$", std::regex_constants::icase)));
+        }
+        if (std::regex_match(value, std::regex("^[0-9]*\\.[0-9]*$")))
+        {
+            set(key, std::stof(value));
+        }
+        if (std::regex_match(value, std::regex("^[0-9]*$")))
+        {
+            set(key, std::stoi(value));
+        }
+    }
 }
 
-Config Config::loadFile(std::string path)
+inline Config Config::loadFile(std::string path)
 {
     std::fstream _file;
     _file.open(path);
@@ -36,9 +71,26 @@ Config Config::loadFile(std::string path)
     return proto;
 }
 
-void* Config::operator [] (std::string key)
+inline void Config::set(std::string key, bool value)
 {
-    return (void*)(&intMap[key]);
+    cfgVal val;
+    val.b = value;
+    map[key] = val;
+}
+inline void Config::set(std::string key, int value)
+{
+    cfgVal val;
+    val.i = value;
+    map[key] = val;
+}
+inline void Config::set(std::string key, float value)
+{
+    cfgVal val;
+    val.f = value;
+    map[key] = val;
 }
 
-#endif
+inline cfgVal Config::get(std::string key)
+{
+    return map[key];
+}
