@@ -6,4 +6,4 @@
 <variable name>                          <variable value>
 <variable name>                          <variable value>
 
-**Example**
+[**Example**](https://github.com/colinm22283/config/blob/main/demo.cfg)
