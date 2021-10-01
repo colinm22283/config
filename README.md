@@ -1,1 +1,1 @@
-# a c++ json parsing library
+# A c++ json parsing library
