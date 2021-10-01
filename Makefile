@@ -7,5 +7,5 @@ run:
 	./tester
 push:
 	git add ./config.h ./Makefile ./README.md ./demo.cfg
-	git commit -m "1.1"
+	git commit -m "Add file writing features"
 	git push -u origin main
