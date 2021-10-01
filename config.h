@@ -18,7 +18,6 @@ class Config
 public:
     Config();
     Config(std::fstream* _file);
-    ~Config();
 
     static Config loadFile(std::string path);
 
@@ -45,19 +44,12 @@ inline Config::Config(std::fstream* _file)
     {
         *file >> key >> value;
 
-        std::cout << "Value: " << value << "\n";
         if (std::regex_match(value, std::regex("^(?:(?:true)|(?:false))$", std::regex_constants::icase)))
-        {
-            set(key, std::regex_match(value, std::regex("^true$", std::regex_constants::icase)));
-        }
+        { set(key, std::regex_match(value, std::regex("^true$", std::regex_constants::icase))); }
         if (std::regex_match(value, std::regex("^[0-9]*\\.[0-9]*$")))
-        {
-            set(key, std::stof(value));
-        }
+        { set(key, std::stof(value)); }
         if (std::regex_match(value, std::regex("^[0-9]*$")))
-        {
-            set(key, std::stoi(value));
-        }
+        { set(key, std::stoi(value)); }
     }
 }
 
