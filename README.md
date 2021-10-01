@@ -1,9 +1,10 @@
 # A C++ Config Parsing Library
 
-# Config Format
+1. Example
+2. [Checklist](
 
-`<variable name>                          <variable value>`
-`<variable name>                          <variable value>`
-`<variable name>                          <variable value>`
+# [Config Example](https://github.com/colinm22283/config/blob/main/demo.cfg)
 
-[**Example**](https://github.com/colinm22283/config/blob/main/demo.cfg)
+# Checklist
+- [x] Read files
+- [ ] Write files
